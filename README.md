@@ -1,8 +1,8 @@
 # tex2net
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/your_username/tex2net/python-package.yml?branch=main)](https://github.com/your_username/tex2net/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/jtaca/tex2net/python-package.yml?branch=main)](https://github.com/jtaca/tex2net/actions)
 [![PyPI version](https://img.shields.io/pypi/v/tex2net)](https://pypi.org/project/tex2net)
-[![License](https://img.shields.io/github/license/your_username/tex2net)](LICENSE)
+[![License](https://img.shields.io/github/license/jtaca/tex2net)](LICENSE)
 [![Python Versions](https://img.shields.io/pypi/pyversions/tex2net)](https://pypi.org/project/tex2net)
 
 ## Overview
