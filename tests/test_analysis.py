@@ -2,7 +2,7 @@
 
 import pytest
 import networkx as nx
-from character_interaction_graph.analysis import (
+from tex2net.analysis import (
     calculate_degree_centrality,
     detect_communities,
     analyze_graph_characteristics
@@ -25,7 +25,7 @@ def test_detect_communities():
 def test_analyze_graph_characteristics(capfd):
     G = nx.DiGraph()
     G.add_edge("Alice", "Bob", actions=["meets"], sentence_ids=[1])
-    from character_interaction_graph.analysis import analyze_graph_characteristics
+    from tex2net.analysis import analyze_graph_characteristics
     analyze_graph_characteristics(G)
     out, err = capfd.readouterr()
     assert "Number of Nodes:" in out
