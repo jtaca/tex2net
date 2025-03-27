@@ -1,0 +1,17 @@
+LICENSE
+README.md
+setup.py
+character_interaction_graph.egg-info/PKG-INFO
+character_interaction_graph.egg-info/SOURCES.txt
+character_interaction_graph.egg-info/dependency_links.txt
+character_interaction_graph.egg-info/requires.txt
+character_interaction_graph.egg-info/top_level.txt
+tests/test_analysis.py
+tests/test_graph.py
+tests/test_rewriting.py
+tex2net/__init__.py
+tex2net/analysis.py
+tex2net/graph.py
+tex2net/init.py
+tex2net/rewriting.py
+tex2net/visualization.py
