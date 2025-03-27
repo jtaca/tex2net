@@ -1,7 +1,7 @@
 # tests/test_graph.py
 
 import pytest
-from character_interaction_graph.graph import create_character_graph, join_similar_nodes
+from tex2net.graph import create_character_graph, join_similar_nodes
 
 def test_create_character_graph():
     text = "Alice meets Bob. Bob greets Alice."
