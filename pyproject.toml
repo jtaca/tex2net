@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tex2net"
-version = "1.21"
+version = "1.22"
 description = "Build charachter graphs from text."
 authors = [
   { name = "jtaca", email = "joaotiagoaparicio@gmail.com" }
@@ -17,7 +17,7 @@ classifiers = [
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
   "Operating System :: OS Independent"
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 
 dependencies = [
   "graphviz",
@@ -33,7 +33,8 @@ dependencies = [
   "torch",
   "pyvis",
   "python-louvain",
-  "pandas"
+  "pandas",
+  "sentencepiece"
 ]
 
 [project.urls]
