@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tex2net"
-version = "1.28"
+version = "1.29"
 description = "Build charachter graphs from text."
 authors = [
   { name = "jtaca", email = "joaotiagoaparicio@gmail.com" }
