@@ -107,6 +107,8 @@ def clean_action_label(action_label, char_list):
     Remove repeated character names from the action label (case-insensitive),
     trim extra whitespace, and truncate overly long text.
     """
+    import re
+    
     for char in char_list:
         # Regex word boundary to avoid partial matches
         pattern = r"(?i)\b" + re.escape(char) + r"\b"
@@ -125,6 +127,7 @@ def clean_action_label(action_label, char_list):
 
 def extract_person_entities(text_string):
     """Extract PERSON entities from a string using spaCy."""
+    nlp = spacy.load("en_core_web_lg")
     temp_doc = nlp(text_string)
     return [ent.text for ent in temp_doc.ents if ent.label_ == "PERSON"]
 
