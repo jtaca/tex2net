@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: tex2net
-Version: 1.22
+Version: 1.26
 Summary: Build charachter graphs from text.
 Author: jtaca
 Author-email: jtaca <joaotiagoaparicio@gmail.com>
@@ -29,6 +29,8 @@ Requires-Dist: pyvis
 Requires-Dist: python-louvain
 Requires-Dist: pandas
 Requires-Dist: sentencepiece
+Requires-Dist: typing_extensions
+Requires-Dist: numpy<2
 
 # tex2net
 
