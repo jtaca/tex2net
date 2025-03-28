@@ -19,7 +19,7 @@ setup(
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: GPL 3 License',
+        'License :: OSI Approved :: GPL-3 License',
         'Operating System :: OS Independent',
     ],
     python_requires='>=3.9',
