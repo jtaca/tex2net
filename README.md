@@ -60,7 +60,9 @@ tex2net.visualize_directed_graph(joined_graph, title="Character Relationships Di
 
 
 ```
-For more complex text the create_character_graph_llm_chunked function can be used.
+For more complex text the create_character_graph_llm_chunked function can be used. 
+
+For longer texts use create_character_graph_llm_long_text.
 
 
 
