@@ -11,6 +11,7 @@ def create_character_graph(text):
     """
     Creates a directed character graph from the input text using spaCy for NER.
     """
+
     # Load the 'en_core_web_lg' model (you can switch to 'en_core_web_sm' if needed)
     nlp = spacy.load('en_core_web_lg')
 
@@ -156,7 +157,7 @@ def create_character_graph_llm_chunked(text, chunk_size=5):
         relationships: A list of character groupings per chunk-sentence
     """
 
-    nlp = spacy.load("en_core_web_sm")
+    nlp = spacy.load("en_core_web_lg")
 
     # QA pipeline for extracting interactions from text
     qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
