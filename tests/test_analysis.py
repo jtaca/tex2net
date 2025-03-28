@@ -2,7 +2,7 @@
 
 import pytest
 import networkx as nx
-from ..tex2net.analysis import (
+from tex2net.analysis import (
     calculate_degree_centrality,
     detect_communities,
     analyze_graph_characteristics
