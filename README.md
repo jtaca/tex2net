@@ -27,7 +27,14 @@ pip install tex2net
 
 ```
 
-Make sure you have all the required dependencies. You can also install them using the provided requirements.txt if needed.
+Make sure you have all the required dependencies. You can also install them using the provided requirements.txt if needed. You may need to run:
+
+```bash
+pip install --upgrade typing_extensions
+python -m spacy download en_core_web_lg
+```
+
+
 
 
 ## Usage Example
