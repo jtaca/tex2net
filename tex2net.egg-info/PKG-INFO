@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: tex2net
-Version: 1.26
+Version: 1.27
 Summary: Build charachter graphs from text.
 Author: jtaca
 Author-email: jtaca <joaotiagoaparicio@gmail.com>
@@ -61,7 +61,14 @@ pip install tex2net
 
 ```
 
-Make sure you have all the required dependencies. You can also install them using the provided requirements.txt if needed.
+Make sure you have all the required dependencies. You can also install them using the provided requirements.txt if needed. You may need to run:
+
+```bash
+pip install --upgrade typing_extensions
+python -m spacy download en_core_web_lg
+```
+
+
 
 
 ## Usage Example
