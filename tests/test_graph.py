@@ -11,8 +11,8 @@ def test_create_character_graph():
     assert graph.number_of_nodes() >= 2
 
 def test_join_similar_nodes():
-    text = "Alice meets Alyce. ALice greets Alyce."
+    text = "Alice meets Alicea. ALice greets Alicea."
     graph, characters, _ = create_character_graph(text)
     new_graph = join_similar_nodes(graph, characters)
-    # Após mesclar nós com nomes semelhantes, o número de nós deve ser menor que o original
+    # After merging nodes with similar names, the number of nodes should be smaller than the original list.
     assert new_graph.number_of_nodes() < len(characters)
