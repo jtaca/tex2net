@@ -1,7 +1,7 @@
 # tests/test_rewriting.py
 
 import pytest
-from tex2net.rewriting import rewrite_with_t5_base, summarize_t5
+from ..tex2net.rewriting import rewrite_with_t5_base, summarize_t5
 
 def test_rewrite_with_t5_base():
     text = "Alice loves Bob."
