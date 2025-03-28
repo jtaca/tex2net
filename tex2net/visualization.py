@@ -178,3 +178,85 @@ def visualize_directed_graph_styled(graph, title="Character Relationships Direct
 
     plt.tight_layout()
     plt.show()
+
+
+
+def visualize_directed_graph_styled_communities(graph, title="Character Relationships Directed Graph", edge_annotation="none"):
+    """
+    Visualizes a directed graph using a community-based layout.
+    The graph is first converted to its largest connected undirected component,
+    then nodes are colored by community and sized by betweenness centrality.
+    
+    Parameters:
+        graph (networkx.DiGraph): The directed graph to be visualized.
+        title (str): Title for the visualization.
+        edge_annotation (str): How to annotate edges. Options:
+            - "none": no annotation,
+            - "number": annotate with number of interactions,
+            - "full": annotate with full details (each action and sentence id).
+    """
+    from networkx.algorithms import community
+    
+    # Convert to undirected and select the largest connected component.
+    H = graph.to_undirected()
+    components = nx.connected_components(H)
+    largest_component = max(components, key=len)
+    H = H.subgraph(largest_component).copy()
+    
+    # Compute betweenness centrality for node sizing.
+    centrality = nx.betweenness_centrality(H, k=10, endpoints=True)
+    
+    # Compute community structure using the greedy modularity algorithm.
+    lpc = community.greedy_modularity_communities(H)
+    community_index = {node: i for i, com in enumerate(lpc) for node in com}
+    
+    # Set up the layout with increased spacing.
+    pos = nx.spring_layout(H, k=0.15, seed=4572321)
+    
+    # Prepare node colors (by community) and sizes (by centrality).
+    node_color = [community_index[node] for node in H.nodes()]
+    node_size = [centrality[node] * 20000 for node in H.nodes()]
+    
+    # Set up the figure.
+    fig, ax = plt.subplots(figsize=(20, 15), facecolor="white")
+    
+    # Draw nodes and labels.
+    nx.draw_networkx_nodes(H, pos, node_color=node_color, node_size=node_size, ax=ax)
+    nx.draw_networkx_labels(H, pos, font_size=12, font_color="black", font_weight="bold", ax=ax)
+    
+    # Draw edges.
+    nx.draw_networkx_edges(H, pos, edge_color="gainsboro", alpha=0.4, ax=ax)
+    
+    # Optionally, annotate edges.
+    if edge_annotation.lower() != "none":
+        edge_labels = {}
+        for u, v, data in H.edges(data=True):
+            actions = data.get("actions", [])
+            sentence_ids = data.get("sentence_ids", [])
+            if edge_annotation.lower() == "number":
+                label = f"{len(actions)}"
+            elif edge_annotation.lower() == "full":
+                combined_label = []
+                for a, sid in zip(actions, sentence_ids):
+                    combined_label.append(f"{a} (sent: {sid})")
+                label = "\n".join(combined_label)
+            else:
+                label = ""
+            edge_labels[(u, v)] = label
+        
+        nx.draw_networkx_edge_labels(H, pos, edge_labels=edge_labels, font_size=10, font_color="gray", ax=ax)
+    
+    # Title and legend.
+    font = {"color": "k", "fontweight": "bold", "fontsize": 20}
+    ax.set_title(title, fontdict=font)
+    font["color"] = "r"
+    ax.text(0.80, 0.10, "node color = community structure", horizontalalignment="center", transform=ax.transAxes, fontdict=font)
+    ax.text(0.80, 0.06, "node size = betweenness centrality", horizontalalignment="center", transform=ax.transAxes, fontdict=font)
+    
+    # Remove axis and adjust margins.
+    ax.axis("off")
+    ax.margins(0.1, 0.05)
+    fig.tight_layout()
+    
+    plt.show()
+
