@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tex2net"
-version = "1.22"
+version = "1.26"
 description = "Build charachter graphs from text."
 authors = [
   { name = "jtaca", email = "joaotiagoaparicio@gmail.com" }
@@ -34,7 +34,9 @@ dependencies = [
   "pyvis",
   "python-louvain",
   "pandas",
-  "sentencepiece"
+  "sentencepiece",
+  "typing_extensions",
+  "numpy<2"
 ]
 
 [project.urls]
