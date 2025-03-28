@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: tex2net
-Version: 0.1.0
+Version: 1.0
 Summary: Build charachter graphs from text.
 Author: Seu Nome
 Author-email: jtaca <joaotiagoaparicio@gmail.com>
@@ -49,6 +49,35 @@ Requires-Dist: pandas
 - **Network Analysis:** Compute centrality measures, detect communities, analyze temporal relationships, and more.
 - **Visualization:** Create both static (Matplotlib) and interactive (Pyvis) visualizations for in-depth narrative analysis.
 
+# Usage Example
+
+Below is an example of how to use tex2net to create a character graph from sample text:
+
+```python
+# Import functions from the tex2net package
+from tex2net.graph import create_character_graph, join_similar_nodes
+
+# Sample text data (this could be text from a novel, article, or LaTeX file)
+text_data = """
+Alice was discussing ideas with Bob. Later, Bob met Charlie and they collaborated on a project.
+Alice was also involved in the conversation.
+"""
+
+# Create a character graph from the text data
+graph = create_character_graph(text_data)
+
+# Optionally, join similar nodes to merge duplicate character entries
+joined_graph = join_similar_nodes(graph)
+
+# Visualize the graph by generating an HTML file (using pyvis or a similar tool)
+joined_graph.show("character_graph.html")
+
+print("Graph generated and saved as character_graph.html")
+
+```
+
+More functions are instantiated in example_usage.ipynb.
+
 ## Installation
 
 Install the package via pip:
@@ -66,7 +95,7 @@ Contributions are welcome! Feel free to submit pull requests or open issues to i
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the GPL-3.0 License.
 
 ---
 
