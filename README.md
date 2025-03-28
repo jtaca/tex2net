@@ -18,7 +18,19 @@
 - **Network Analysis:** Compute centrality measures, detect communities, analyze temporal relationships, and more.
 - **Visualization:** Create both static (Matplotlib) and interactive (Pyvis) visualizations for in-depth narrative analysis.
 
-# Usage Example
+## Installation
+
+Install the package via pip:
+
+```bash
+pip install tex2net
+
+```
+
+Make sure you have all the required dependencies. You can also install them using the provided requirements.txt if needed.
+
+
+## Usage Example
 
 Below is an example of how to use tex2net to create a character graph from sample text:
 
@@ -44,16 +56,6 @@ tex2net.visualize_directed_graph(joined_graph, title="Character Relationships Di
 
 More functions are instantiated in example_usage.ipynb.
 
-## Installation
-
-Install the package via pip:
-
-```bash
-pip install tex2net
-
-```
-
-Make sure you have all the required dependencies. You can also install them using the provided requirements.txt if needed.
 
 ## Contributing
 
