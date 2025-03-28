@@ -1,0 +1,17 @@
+LICENSE
+README.md
+pyproject.toml
+setup.py
+tests/test_analysis.py
+tests/test_graph.py
+tests/test_rewriting.py
+tex2net/__init__.py
+tex2net/analysis.py
+tex2net/graph.py
+tex2net/rewriting.py
+tex2net/visualization.py
+tex2net.egg-info/PKG-INFO
+tex2net.egg-info/SOURCES.txt
+tex2net.egg-info/dependency_links.txt
+tex2net.egg-info/requires.txt
+tex2net.egg-info/top_level.txt
