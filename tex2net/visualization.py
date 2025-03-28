@@ -144,7 +144,7 @@ def visualize_directed_graph_styled(graph, title="Character Relationships Direct
         bidirectional = data.get("bidirectional", True)
         edge_color = "lightgray" if bidirectional else "gray"
         arrow_style = "fancy" if bidirectional else "->"
-        edge_labels[(source, target)] = f"{', '.join(actions)} (IDs: {', '.join(map(str, sentence_ids))})"
+        edge_labels[(source, target)] = f"{'\n '.join(actions)} (IDs: {', '.join(map(str, sentence_ids))})"
 
         nx.draw_networkx_edges(
             graph,
