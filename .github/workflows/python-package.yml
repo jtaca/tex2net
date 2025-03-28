@@ -28,6 +28,7 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
           python -m spacy download en_core_web_lg
+          
 
       - name: Run tests
         working-directory: ${{ github.workspace }}
