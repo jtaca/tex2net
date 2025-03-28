@@ -1,17 +1,17 @@
 Metadata-Version: 2.1
 Name: tex2net
-Version: 1.1
+Version: 1.2
 Summary: Build charachter graphs from text.
-Author: Seu Nome
+Author: jtaca
 Author-email: jtaca <joaotiagoaparicio@gmail.com>
-License: MIT
+License: GPL-3
 Project-URL: Source, https://github.com/jtaca/tex2net
 Project-URL: Tracker, https://github.com/jtaca/tex2net/issues
 Keywords: knowledge-graph,NLP,unstructured-data,slm
 Classifier: Programming Language :: Python :: 3
-Classifier: License :: OSI Approved :: MIT License
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
 Classifier: Operating System :: OS Independent
-Requires-Python: >=3.8
+Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: graphviz
@@ -84,6 +84,9 @@ tex2net.visualize_directed_graph(joined_graph, title="Character Relationships Di
 
 
 ```
+For more complex text the create_character_graph_llm_chunked function can be used.
+
+
 
 More functions are instantiated in example_usage.ipynb.
 
