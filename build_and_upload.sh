@@ -15,6 +15,6 @@ python -m build || { echo "Build failed"; exit 1; }
 
 # Upload the built distribution using twine.
 echo "Uploading the package to PyPI..."
-twine upload dist/* || { echo "Upload failed"; exit 1; }
+twine upload --skip-existing dist/* || { echo "Upload failed"; exit 1; }
 
 echo "Done!"
