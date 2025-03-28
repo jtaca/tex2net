@@ -12,3 +12,4 @@ torch
 pyvis
 python-louvain
 pandas
+sentencepiece
