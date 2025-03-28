@@ -18,6 +18,7 @@ setup(
         'pandas',
         'sentencepiece',
         'en-core-web-lg>=3.0.0',
+        'numpy<2'
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
