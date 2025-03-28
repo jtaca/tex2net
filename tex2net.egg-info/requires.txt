@@ -13,3 +13,5 @@ pyvis
 python-louvain
 pandas
 sentencepiece
+typing_extensions
+numpy<2
