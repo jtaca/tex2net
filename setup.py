@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='character_interaction_graph',
-    version='1.2',
+    version='1.22',
     description='Biblioteca para criação e análise de grafos de interações de personagens a partir de textos narrativos utilizando NLP e análise de grafos',
     author='jtaca',
     author_email='joaotiagoaparicio@gmail.com',
@@ -15,7 +15,9 @@ setup(
         'torch',
         'pyvis',
         'python-louvain',
-        'pandas'
+        'pandas',
+        'sentencepiece',
+        'en-core-web-lg>=3.0.0',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
