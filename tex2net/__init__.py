@@ -1,4 +1,4 @@
-from .graph import create_character_graph, join_similar_nodes, create_character_graph_llm_chunked, count_cooccurrences
+from .graph import create_character_graph, join_similar_nodes, create_character_graph_llm_chunked, count_cooccurrences, create_character_graph_llm_long_text
 from .rewriting import summarize_t5
 from .analysis import (
     plot_character_centralities,
