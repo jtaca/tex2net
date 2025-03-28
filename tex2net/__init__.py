@@ -10,5 +10,5 @@ from .analysis import (
     detect_communities,
     calculate_degree_centrality,
 )
-from .visualization import visualize_graph, visualize_pyvis_graph, visualize_directed_graph
+from .visualization import visualize_graph, visualize_pyvis_graph, visualize_directed_graph, visualize_directed_graph_styled
 
