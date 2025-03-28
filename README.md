@@ -41,3 +41,25 @@ This project is licensed under the MIT License.
 
 Happy storytelling and network exploring!
 
+Citation
+
+If you find tex2net helpful in your academic or professional work, please cite the following paper:
+
+graphql
+Copy
+@inproceedings{aparicio2023tex2net,
+  title={tex2net: A Package for Storytelling Using Network Models},
+  author={Aparicio, Joao Tiago and Arsenio, Elisabete and Henriques, Rui},
+  booktitle={Proceedings of the 41st ACM International Conference on Design of Communication},
+  pages={119--125},
+  year={2023}
+}
+
+or 
+
+Aparicio, J. T., Arsenio, E., & Henriques, R. (2023, October). tex2net: A Package for Storytelling Using Network Models. In Proceedings of the 41st ACM International Conference on Design of Communication (pp. 119-125).
+
+You can find the paper at ACM Digital Library: https://dl.acm.org/doi/pdf/10.1145/3615335.3623022.
+
+
+
