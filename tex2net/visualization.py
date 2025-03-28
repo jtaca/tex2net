@@ -137,19 +137,25 @@ def visualize_directed_graph_styled(graph, title="Character Relationships Direct
 
     # Draw edges with annotations
     edge_labels = {}
-    for source, target, data in graph.edges(data=True):
-        actions = data["actions"]
-        sentence_ids = data["sentence_ids"]
+    for u, v, data in graph.edges(data=True):
+        actions = data.get("actions", [])
+        s_ids = data.get("sentence_ids", [])
         weight = len(actions)
         bidirectional = data.get("bidirectional", True)
         edge_color = "lightgray" if bidirectional else "gray"
         arrow_style = "fancy" if bidirectional else "->"
-        edge_labels[(source, target)] = f"{'\n '.join(actions)} (IDs: {', '.join(map(str, sentence_ids))})"
+        combined_label = []
+        
+        for a, sid in zip(actions, s_ids):
+            # Example: "discussing ideas (sent: 1)"
+            combined_label.append(f"{a} (sent: {sid})")
+        # Put each label on a new line
+        edge_labels[(u, v)] = "\n".join(combined_label)
 
         nx.draw_networkx_edges(
             graph,
             pos=layout,
-            edgelist=[(source, target)],
+            edgelist=[(u, v)],
             edge_color=edge_color,
             arrowstyle=arrow_style,
             arrows=True,
