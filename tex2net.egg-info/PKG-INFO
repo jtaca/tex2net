@@ -54,25 +54,22 @@ Requires-Dist: pandas
 Below is an example of how to use tex2net to create a character graph from sample text:
 
 ```python
-# Import functions from the tex2net package
-from tex2net.graph import create_character_graph, join_similar_nodes
+
+import tex2net
 
 # Sample text data (this could be text from a novel, article, or LaTeX file)
 text_data = """
-Alice was discussing ideas with Bob. Later, Bob met Charlie and they collaborated on a project.
-Alice was also involved in the conversation.
+Alice was discussing ideas with Bob. Later, Bob met Charlie.
 """
 
 # Create a character graph from the text data
-graph = create_character_graph(text_data)
+graph, characters, relationships = tex2net.create_character_graph(text_data)
 
 # Optionally, join similar nodes to merge duplicate character entries
-joined_graph = join_similar_nodes(graph)
+joined_graph = tex2net.join_similar_nodes(graph, characters)
 
-# Visualize the graph by generating an HTML file (using pyvis or a similar tool)
-joined_graph.show("character_graph.html")
+tex2net.visualize_directed_graph(joined_graph, title="Character Relationships Directed Graph")
 
-print("Graph generated and saved as character_graph.html")
 
 ```
 
