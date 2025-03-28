@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tex2net"
-version = "1.0"
+version = "1.2"
 description = "Build charachter graphs from text."
 authors = [
   { name = "jtaca", email = "joaotiagoaparicio@gmail.com" }
@@ -14,7 +14,7 @@ license = { text = "MIT" }
 keywords = ["knowledge-graph", "NLP", "unstructured-data", "slm"]
 classifiers = [
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
+  "License :: OSI Approved :: GPL 3 License",
   "Operating System :: OS Independent"
 ]
 requires-python = ">=3.7"
