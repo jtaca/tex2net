@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tex2net"
+version = "0.1.0"
+description = "Build charachter graphs from text."
+authors = [
+  { name = "jtaca", email = "joaotiagoaparicio@gmail.com" }
+]
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["knowledge-graph", "NLP", "unstructured-data", "slm"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+requires-python = ">=3.7"
+
+dependencies = [
+  "graphviz",
+  "pyyaml",
+  "python-docx",
+  "python-dotenv",
+  "PyPDF2",
+  "lxml",
+  "spacy>=3.0",
+  "networkx>=2.0",
+  "matplotlib>=3.0",
+  "transformers>=4.0",
+  "torch",
+  "pyvis",
+  "python-louvain",
+  "pandas"
+]
+
+[project.urls]
+"Source" = "https://github.com/jtaca/tex2net"
+"Tracker" = "https://github.com/jtaca/tex2net/issues"
