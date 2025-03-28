@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='character_interaction_graph',
-    version='0.1.0',
+    version='1.2',
     description='Biblioteca para criação e análise de grafos de interações de personagens a partir de textos narrativos utilizando NLP e análise de grafos',
-    author='Seu Nome',
-    author_email='seu.email@exemplo.com',
+    author='jtaca',
+    author_email='joaotiagoaparicio@gmail.com',
     packages=find_packages(),
     install_requires=[
         'spacy>=3.0',
@@ -19,8 +19,8 @@ setup(
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: GPL 3 License',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.9',
 )
