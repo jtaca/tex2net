@@ -63,6 +63,56 @@ def visualize_pyvis_graph(graph, output_file="character_relationships.html"):
 
 def visualize_directed_graph(graph, title="Character Relationships Directed Graph"):
     """
+    Parameters:
+        graph (networkx.DiGraph): The directed graph to be visualized.
+        title (str): The title for the visualization.
+    Visualizes a directed graph using Matplotlib and labels edges with actions,
+    each on a new line.
+    """
+    import matplotlib.pyplot as plt
+
+    pos = nx.spring_layout(graph, seed=42, k=3)
+    plt.figure(figsize=(10, 10), facecolor="white")
+    nx.draw_networkx_nodes(graph, pos=pos, node_color="lightblue", node_size=3000)
+    nx.draw_networkx_labels(graph, pos=pos, font_size=10, font_color="black", font_weight="bold")
+
+    # Build edge labels (multi-line)
+    edge_labels = {}
+    for u, v, data in graph.edges(data=True):
+        actions = data.get("actions", [])
+        s_ids = data.get("sentence_ids", [])
+        combined_label = []
+        for a, sid in zip(actions, s_ids):
+            # Example: "discussing ideas (sent: 1)"
+            combined_label.append(f"{a} (sent: {sid})")
+        # Put each label on a new line
+        edge_labels[(u, v)] = "\n".join(combined_label)
+
+    nx.draw_networkx_edges(
+        graph,
+        pos=pos,
+        arrows=True,
+        arrowstyle="->",
+        connectionstyle="arc3,rad=0.1",
+        width=1.5
+    )
+    nx.draw_networkx_edge_labels(
+        graph,
+        pos=pos,
+        edge_labels=edge_labels,
+        font_size=8,
+        font_color="gray",
+        label_pos=0.5
+    )
+
+    plt.title(title, fontsize=14, fontweight="bold")
+    plt.axis("off")
+    plt.show()
+
+
+
+def visualize_directed_graph_styled(graph, title="Character Relationships Directed Graph"):
+    """
     Visualizes a directed graph with increased spacing using Matplotlib.
     
     Parameters:
