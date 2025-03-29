@@ -180,12 +180,20 @@ def visualize_directed_graph_styled(graph, title="Character Relationships Direct
     plt.show()
 
 
+import matplotlib.pyplot as plt
+import networkx as nx
+from networkx.algorithms import community
+import matplotlib.cm as cm
 
 def visualize_directed_graph_styled_communities(graph, title="Character Relationships Directed Graph", edge_annotation="none"):
     """
     Visualizes a directed graph using a community-based layout.
     The graph is first converted to its largest connected undirected component,
-    then nodes are colored by community and sized by betweenness centrality.
+    then nodes are colored by community (using a pastel colormap for light colors)
+    and sized by a centrality measure.
+    
+    If betweenness centrality calculation fails (due to a small population),
+    degree centrality is used instead and a message is printed.
     
     Parameters:
         graph (networkx.DiGraph): The directed graph to be visualized.
@@ -195,33 +203,41 @@ def visualize_directed_graph_styled_communities(graph, title="Character Relation
             - "number": annotate with number of interactions,
             - "full": annotate with full details (each action and sentence id).
     """
+
     from networkx.algorithms import community
-    
     # Convert to undirected and select the largest connected component.
     H = graph.to_undirected()
     components = nx.connected_components(H)
     largest_component = max(components, key=len)
     H = H.subgraph(largest_component).copy()
     
-    # Compute betweenness centrality for node sizing.
-    centrality = nx.betweenness_centrality(H, k=10, endpoints=True)
+    # Compute centrality for node sizing.
+    try:
+        centrality = nx.betweenness_centrality(H, k=10, endpoints=True)
+    except ValueError as e:
+        print("Betweenness centrality calculation failed (likely due to small population). Using degree centrality instead.")
+        centrality = nx.degree_centrality(H)
     
     # Compute community structure using the greedy modularity algorithm.
     lpc = community.greedy_modularity_communities(H)
     community_index = {node: i for i, com in enumerate(lpc) for node in com}
     
+    # Use a pastel colormap to get very light colors.
+    num_communities = max(community_index.values()) + 1
+    cmap = cm.get_cmap("Pastel1", num_communities)
+    node_colors = [cmap(community_index[node]) for node in H.nodes()]
+    
     # Set up the layout with increased spacing.
     pos = nx.spring_layout(H, k=0.15, seed=4572321)
     
-    # Prepare node colors (by community) and sizes (by centrality).
-    node_color = [community_index[node] for node in H.nodes()]
+    # Prepare node sizes.
     node_size = [centrality[node] * 20000 for node in H.nodes()]
     
     # Set up the figure.
     fig, ax = plt.subplots(figsize=(20, 15), facecolor="white")
     
     # Draw nodes and labels.
-    nx.draw_networkx_nodes(H, pos, node_color=node_color, node_size=node_size, ax=ax)
+    nx.draw_networkx_nodes(H, pos, node_color=node_colors, node_size=node_size, ax=ax)
     nx.draw_networkx_labels(H, pos, font_size=12, font_color="black", font_weight="bold", ax=ax)
     
     # Draw edges.
@@ -246,12 +262,14 @@ def visualize_directed_graph_styled_communities(graph, title="Character Relation
         
         nx.draw_networkx_edge_labels(H, pos, edge_labels=edge_labels, font_size=10, font_color="gray", ax=ax)
     
-    # Title and legend.
+    # Title.
     font = {"color": "k", "fontweight": "bold", "fontsize": 20}
     ax.set_title(title, fontdict=font)
-    font["color"] = "r"
-    ax.text(0.80, 0.10, "node color = community structure", horizontalalignment="center", transform=ax.transAxes, fontdict=font)
-    ax.text(0.80, 0.06, "node size = betweenness centrality", horizontalalignment="center", transform=ax.transAxes, fontdict=font)
+    
+    # Instead of drawing the red legend text on the figure,
+    # print the legend info to the console.
+    print("Legend: node color = community structure")
+    print("Legend: node size = centrality measure")
     
     # Remove axis and adjust margins.
     ax.axis("off")
@@ -259,4 +277,98 @@ def visualize_directed_graph_styled_communities(graph, title="Character Relation
     fig.tight_layout()
     
     plt.show()
+
+
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+import networkx as nx
+
+def visualize_interaction_temporality(graph, mode="histogram"):
+    """
+    Visualizes the temporality of interactions in a character network.
+    
+    This function expects that each edge in the graph has an attribute 'sentence_ids',
+    which is a list of sentence numbers (or time markers) where the interaction occurs.
+    
+    Parameters:
+        graph (networkx.DiGraph or networkx.Graph): The character network.
+        mode (str): The mode of visualization:
+            - "histogram": A histogram of interactions per sentence.
+            - "timeline": An event plot showing interactions along a horizontal timeline.
+            - "cumulative": A plot showing the cumulative count of interactions over time.
+    
+    Returns:
+        None. Displays the plot using matplotlib.
+        
+    Robust error handling is applied to catch and report issues during processing.
+    """
+    try:
+        # Extract all sentence_ids from graph edges.
+        sentence_ids = []
+        for u, v, data in graph.edges(data=True):
+            s_ids = data.get("sentence_ids", [])
+            if s_ids:
+                sentence_ids.extend(s_ids)
+        
+        if not sentence_ids:
+            print("No temporal data ('sentence_ids') found in graph edges.")
+            return
+        
+        # Ensure sentence_ids is a numpy array of numbers.
+        sentence_ids = np.array(sentence_ids, dtype=float)
+        
+        if mode.lower() == "histogram":
+            try:
+                plt.figure(figsize=(10, 6))
+                # Use bins covering the full range of sentence numbers.
+                bins = np.arange(np.min(sentence_ids), np.max(sentence_ids) + 2) - 0.5
+                plt.hist(sentence_ids, bins=bins, color="skyblue", edgecolor="black")
+                plt.xlabel("Sentence Number")
+                plt.ylabel("Number of Interactions")
+                plt.title("Histogram of Interactions Over Time (by Sentence Number)")
+                plt.show()
+            except Exception as e:
+                print(f"Failed to create histogram: {e}")
+        
+        elif mode.lower() == "timeline":
+            try:
+                # Create an event plot: each edge's events are one line of markers.
+                events = []
+                for u, v, data in graph.edges(data=True):
+                    s_ids = data.get("sentence_ids", [])
+                    if s_ids:
+                        events.append(s_ids)
+                plt.figure(figsize=(10, 6))
+                plt.eventplot(events, orientation='horizontal', colors='skyblue')
+                plt.xlabel("Sentence Number")
+                plt.title("Timeline of Interactions")
+                plt.show()
+            except Exception as e:
+                print(f"Failed to create timeline plot: {e}")
+        
+        elif mode.lower() == "cumulative":
+            try:
+                min_sent = int(np.min(sentence_ids))
+                max_sent = int(np.max(sentence_ids))
+                # Create bins for each sentence number.
+                bins = np.arange(min_sent, max_sent + 1)
+                hist, bin_edges = np.histogram(sentence_ids, bins=bins)
+                cumulative = np.cumsum(hist)
+                plt.figure(figsize=(10, 6))
+                plt.plot(bin_edges[:-1], cumulative, marker='o', color='skyblue')
+                plt.xlabel("Sentence Number")
+                plt.ylabel("Cumulative Interactions")
+                plt.title("Cumulative Interactions Over Time")
+                plt.show()
+            except Exception as e:
+                print(f"Failed to create cumulative plot: {e}")
+        
+        else:
+            print(f"Mode '{mode}' not recognized. Please choose 'histogram', 'timeline', or 'cumulative'.")
+    
+    except Exception as e:
+        print(f"An error occurred while visualizing temporality: {e}")
+
 
