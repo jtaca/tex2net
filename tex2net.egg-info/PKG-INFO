@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
 Name: tex2net
-Version: 1.37
-Summary: Build charachter graphs from text.
+Version: 1.38
+Summary: Build character graphs from text.
 Author: jtaca
 Author-email: jtaca <joaotiagoaparicio@gmail.com>
 License: GPL-3
