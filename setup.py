@@ -8,7 +8,7 @@ setup(
     author_email='joaotiagoaparicio@gmail.com',
     packages=find_packages(),
     install_requires=[
-        'spacy>=3.0',
+        'spacy==3.8.3',
         'networkx>=2.0',
         'matplotlib>=3.0',
         'transformers>=4.0',
