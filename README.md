@@ -85,8 +85,8 @@ Citation
 
 If you find tex2net helpful in your academic or professional work, please cite the following paper:
 
-graphql
-Copy
+```latex
+
 @inproceedings{aparicio2023tex2net,
   title={tex2net: A Package for Storytelling Using Network Models},
   author={Aparicio, Joao Tiago and Arsenio, Elisabete and Henriques, Rui},
@@ -94,6 +94,7 @@ Copy
   pages={119--125},
   year={2023}
 }
+```
 
 or 
 
