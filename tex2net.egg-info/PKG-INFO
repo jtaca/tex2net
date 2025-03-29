@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: tex2net
-Version: 1.35
+Version: 1.36
 Summary: Build charachter graphs from text.
 Author: jtaca
 Author-email: jtaca <joaotiagoaparicio@gmail.com>
@@ -20,7 +20,7 @@ Requires-Dist: python-docx
 Requires-Dist: python-dotenv
 Requires-Dist: PyPDF2
 Requires-Dist: lxml
-Requires-Dist: spacy>=3.0
+Requires-Dist: spacy==3.8.3
 Requires-Dist: networkx>=2.0
 Requires-Dist: matplotlib>=3.0
 Requires-Dist: transformers>=4.0
