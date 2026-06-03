@@ -4,17 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tex2net"
-version = "1.38"
+version = "1.39"
 description = "Build character graphs from text."
 authors = [
   { name = "jtaca", email = "joaotiagoaparicio@gmail.com" }
 ]
 readme = "README.md"
-license = { text = "GPL-3" }
+license = "GPL-3.0-only"
 keywords = ["knowledge-graph", "NLP", "unstructured-data", "slm"]
 classifiers = [
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
   "Operating System :: OS Independent"
 ]
 requires-python = ">=3.9"
@@ -42,3 +41,6 @@ dependencies = [
 [project.urls]
 "Source" = "https://github.com/jtaca/tex2net"
 "Tracker" = "https://github.com/jtaca/tex2net/issues"
+
+[tool.setuptools.packages.find]
+include = ["tex2net*"]

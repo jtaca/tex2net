@@ -73,6 +73,17 @@ More functions are instantiated in example_usage.ipynb.
 
 Contributions are welcome! Feel free to submit pull requests or open issues to improve the functionality of this library. Please follow the code style and add tests for any new features.
 
+## Release process
+
+Releases are published to PyPI with GitHub Actions and PyPI Trusted Publishing.
+
+1. Update the version in `pyproject.toml`.
+2. Merge the change into `main`.
+3. Create and push a version tag such as `v1.39`.
+4. Wait for the `Release tex2net to PyPI` workflow to finish.
+
+The publishing job expects a GitHub environment named `pypi` and a matching Trusted Publisher entry on PyPI for this repository and workflow file.
+
 ## License
 
 This project is licensed under the GPL-3.0 License.

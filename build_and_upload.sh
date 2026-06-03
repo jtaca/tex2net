@@ -1,20 +1,21 @@
 #!/bin/bash
 # build_and_upload.sh
-# This script activates the "flask" conda environment,
-# builds the package, and uploads it to PyPI via twine.
+# Local build verification helper.
+# Publishing is handled by GitHub Actions via PyPI Trusted Publishing.
 
-# Activate the "flask" environment.
-conda activate flask
+set -euo pipefail
 
-pip install build
-pip install twine
+python -m pip install --upgrade pip
+python -m pip install build twine
+
+rm -rf build dist *.egg-info
 
 # Build the package using PEP 517 (pyproject.toml).
 echo "Building the package..."
 python -m build || { echo "Build failed"; exit 1; }
 
-# Upload the built distribution using twine.
-echo "Uploading the package to PyPI..."
-twine upload --skip-existing dist/* || { echo "Upload failed"; exit 1; }
+# Validate the built distributions.
+echo "Checking distributions..."
+python -m twine check dist/* || { echo "Distribution check failed"; exit 1; }
 
-echo "Done!"
+echo "Build artifacts verified. Publish by pushing a version tag to GitHub."
