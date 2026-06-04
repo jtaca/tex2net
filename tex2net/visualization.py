@@ -1,13 +1,13 @@
 # character_interaction_graph/visualization.py
 
 import networkx as nx
-import matplotlib.pyplot as plt
-from pyvis.network import Network
 
 def visualize_graph(graph, title="Character Relationships"):
     """
     Visualiza o grafo usando matplotlib.
     """
+    import matplotlib.pyplot as plt
+
     layout = nx.spring_layout(graph, seed=42, k=4)
     plt.rcParams["axes.facecolor"] = "white"
     fig, ax = plt.subplots(figsize=(10, 10), facecolor="white")
@@ -44,6 +44,8 @@ def visualize_pyvis_graph(graph, output_file="character_relationships.html"):
     """
     Visualiza o grafo de forma interativa utilizando Pyvis.
     """
+    from pyvis.network import Network
+
     layout = nx.spring_layout(graph, seed=42, k=1.5)
     net = Network(notebook=True, width="100%", height="100%", bgcolor="#ffffff", font_color="black", directed=True)
     for node in graph.nodes:
@@ -179,12 +181,6 @@ def visualize_directed_graph_styled(graph, title="Character Relationships Direct
     plt.tight_layout()
     plt.show()
 
-
-import matplotlib.pyplot as plt
-import networkx as nx
-from networkx.algorithms import community
-import matplotlib.cm as cm
-
 def visualize_directed_graph_styled_communities(graph, title="Character Relationships Directed Graph", edge_annotation="none"):
     """
     Visualizes a directed graph using a community-based layout.
@@ -204,7 +200,10 @@ def visualize_directed_graph_styled_communities(graph, title="Character Relation
             - "full": annotate with full details (each action and sentence id).
     """
 
+    import matplotlib.cm as cm
+    import matplotlib.pyplot as plt
     from networkx.algorithms import community
+
     # Convert to undirected and select the largest connected component.
     H = graph.to_undirected()
     components = nx.connected_components(H)
@@ -278,13 +277,6 @@ def visualize_directed_graph_styled_communities(graph, title="Character Relation
     
     plt.show()
 
-
-
-
-import matplotlib.pyplot as plt
-import numpy as np
-import networkx as nx
-
 def visualize_interaction_temporality(graph, mode="histogram"):
     """
     Visualizes the temporality of interactions in a character network.
@@ -304,6 +296,9 @@ def visualize_interaction_temporality(graph, mode="histogram"):
         
     Robust error handling is applied to catch and report issues during processing.
     """
+    import matplotlib.pyplot as plt
+    import numpy as np
+
     try:
         # Extract all sentence_ids from graph edges.
         sentence_ids = []
