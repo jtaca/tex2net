@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tex2net Gallery</title>
+    <meta
+      name="description"
+      content="An interactive gallery for tex2net, showcasing narrative graph extraction, network science metrics, temporal analysis, and long-corpus examples."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="masthead">
+        <div class="brand-block">
+          <p class="site-kicker">tex2net gallery</p>
+          <h1 class="site-title">Narrative graphs, presented as a proper research showcase.</h1>
+        </div>
+        <nav class="top-nav" aria-label="Primary">
+          <a href="#overview">Overview</a>
+          <a href="#examples">Examples</a>
+          <a href="https://pypi.org/project/tex2net/">PyPI</a>
+          <a href="https://github.com/jtaca/tex2net">GitHub</a>
+        </nav>
+      </header>
+
+      <section class="hero" id="overview">
+        <div class="hero-copy">
+          <p class="eyebrow">Storytelling with network models</p>
+          <h2 class="hero-title">Interactive story graphs for narratives, papers, and long corpora.</h2>
+          <p class="hero-text">
+            tex2net transforms prose into relationship networks that can be inspected as evidence-backed graphs,
+            summarized with network measures, and explored through interactive visualizations.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://pypi.org/project/tex2net/">Install from PyPI</a>
+            <a class="button secondary" href="https://github.com/jtaca/tex2net">Browse the repository</a>
+          </div>
+        </div>
+
+        <aside class="hero-aside">
+          <section class="overview-panel">
+            <h3>Archive summary</h3>
+            <div class="overview-grid" id="overview-cards">
+              <div>
+                <span class="metric-label">Examples</span>
+                <strong id="example-count">—</strong>
+              </div>
+              <div>
+                <span class="metric-label">Characters</span>
+                <strong id="node-count">—</strong>
+              </div>
+              <div>
+                <span class="metric-label">Interactions</span>
+                <strong id="edge-count">—</strong>
+              </div>
+              <div>
+                <span class="metric-label">Max span</span>
+                <strong id="max-span">—</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="note-panel">
+            <h3>What this page demonstrates</h3>
+            <ul>
+              <li>Character extraction and graph construction</li>
+              <li>Alias resolution and node consolidation</li>
+              <li>Community structure, PageRank, and bridge analysis</li>
+              <li>Chunked and long-corpus temporal tracking</li>
+            </ul>
+          </section>
+        </aside>
+      </section>
+
+      <section class="editorial-strip">
+        <article class="editorial-card">
+          <p class="eyebrow">Method</p>
+          <h2>From sentences to evidence-backed networks</h2>
+          <p>
+            Each example is generated from text, converted into a directed character network, and then analyzed through centrality,
+            cohesion, temporality, and bridge structure. The resulting visuals are stored as static and interactive artifacts in this repository.
+          </p>
+        </article>
+        <article class="editorial-card editorial-card-accent">
+          <p class="eyebrow">Use cases</p>
+          <h2>Built for literary analysis, digital humanities, and narrative prototyping</h2>
+          <p>
+            The examples below move from short scenes to long-form synthetic chronicles, showing how the same workflow scales from quick inspection
+            to richer corpus exploration.
+          </p>
+        </article>
+      </section>
+
+      <main>
+        <section class="gallery-section" id="examples">
+          <div class="section-heading">
+            <p class="eyebrow">Showcase</p>
+            <h2>Example dossiers</h2>
+            <p>Each dossier pairs the interactive graph with static evidence views and a concise network profile.</p>
+          </div>
+          <div id="gallery" class="gallery"></div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>
+          tex2net gallery · generated from repository assets · designed as a restrained, archival-style project site.
+        </p>
+      </footer>
+    </div>
+
+    <template id="example-template">
+      <article class="example-card">
+        <div class="example-header">
+          <div>
+            <p class="eyebrow example-builder"></p>
+            <h3 class="example-title"></h3>
+            <p class="example-subtitle"></p>
+          </div>
+          <div class="pill-row">
+            <span class="pill example-characters"></span>
+            <span class="pill example-communities"></span>
+          </div>
+        </div>
+
+        <div class="example-body">
+          <section class="example-narrative">
+            <p class="example-description"></p>
+            <blockquote class="example-excerpt"></blockquote>
+            <dl class="mini-metrics"></dl>
+          </section>
+
+          <section class="example-evidence">
+            <div class="embed-card embed-card-wide">
+              <div class="embed-label-row">
+                <span>Interactive graph</span>
+                <a class="embed-link interactive-link" target="_blank" rel="noreferrer">Open full view</a>
+              </div>
+              <iframe class="interactive-frame" loading="lazy" title="Interactive graph"></iframe>
+            </div>
+
+            <div class="embed-grid">
+              <div class="embed-card">
+                <span class="embed-label">Community structure</span>
+                <img class="community-image" loading="lazy" alt="Community structure visualization" />
+              </div>
+              <div class="embed-card">
+                <span class="embed-label">Temporal interactions</span>
+                <img class="temporal-image" loading="lazy" alt="Temporal interaction visualization" />
+              </div>
+              <div class="embed-card">
+                <span class="embed-label">Centrality profile</span>
+                <img class="centrality-image" loading="lazy" alt="Centrality chart" />
+              </div>
+              <div class="embed-card">
+                <span class="embed-label">Network notes</span>
+                <ul class="annotation-list"></ul>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="lists-grid">
+          <div>
+            <h4>Top PageRank</h4>
+            <ul class="ranking-list pagerank-list"></ul>
+          </div>
+          <div>
+            <h4>Bridge characters</h4>
+            <ul class="ranking-list bridge-list"></ul>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="assets/gallery.js"></script>
+  </body>
+</html>
