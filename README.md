@@ -27,6 +27,8 @@ pip install tex2net
 
 ```
 
+tex2net currently supports Python 3.10 and newer.
+
 Make sure you have all the required dependencies. You can also install them using the provided requirements.txt if needed. You may need to run:
 
 ```bash
@@ -90,7 +92,7 @@ Releases are published to PyPI with GitHub Actions and PyPI Trusted Publishing.
 
 1. Update the version in `pyproject.toml`.
 2. Merge the change into `main`.
-3. Create and push a version tag such as `v1.40`.
+3. Create and push a version tag such as `v1.41`.
 4. Wait for the `Release tex2net to PyPI` workflow to finish.
 
 The publishing job expects a GitHub environment named `pypi` and a matching Trusted Publisher entry on PyPI for this repository and workflow file.
