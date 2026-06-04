@@ -7,4 +7,5 @@ pyvis
 python-louvain
 pandas
 sentencepiece
+protobuf
 numpy<2

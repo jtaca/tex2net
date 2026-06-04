@@ -34,6 +34,7 @@ dependencies = [
   "python-louvain",
   "pandas",
   "sentencepiece",
+  "protobuf",
   "typing_extensions",
   "numpy<2"
 ]
