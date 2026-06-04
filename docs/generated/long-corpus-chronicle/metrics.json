@@ -1,0 +1,128 @@
+{
+  "slug": "long-corpus-chronicle",
+  "title": "Long-Corpus Chronicle",
+  "description": "A longer synthetic chronicle designed to exercise stable sentence IDs, chunking, and long-range temporal structure.",
+  "builder": "long",
+  "text_excerpt": "Aria briefed Captain Hale beside the harbor gate. Captain Hale introduced Aria to Scholar Neri in the watchtower. Scholar Neri warned Mayor Sol about hidden ledgers. Mayor Sol summoned Guard Petra to the council\u2026",
+  "character_count": 7,
+  "relationship_groups": 20,
+  "community_count": 1,
+  "metrics": {
+    "number_of_nodes": 7,
+    "number_of_edges": 22,
+    "density": 0.5238095238095238,
+    "reciprocity": 0.36363636363636365,
+    "average_clustering": 0.8333333333333334,
+    "average_shortest_path": 1.1428571428571428,
+    "degree_assortativity": -0.0894427190999916,
+    "top_pagerank_character": "Guard Petra",
+    "max_k_core": 4,
+    "bridge_characters": []
+  },
+  "graph_characteristics": {
+    "number_of_nodes": 7,
+    "number_of_edges": 22,
+    "average_degree": 6.285714285714286,
+    "average_clustering_coefficient": 0.8333333333333334,
+    "density": 0.5238095238095238,
+    "degree_assortativity": -0.0894427190999916
+  },
+  "temporal_metrics": {
+    "average_temporal_distance": 13.5,
+    "density": 0.5238095238095238,
+    "reciprocity": 0.36363636363636365,
+    "interaction_span": 19,
+    "interaction_events": 24
+  },
+  "top_degree": [
+    {
+      "name": "Aria",
+      "value": 1.1667
+    },
+    {
+      "name": "Captain Hale",
+      "value": 1.1667
+    },
+    {
+      "name": "Scholar Neri",
+      "value": 1.1667
+    },
+    {
+      "name": "Mayor Sol",
+      "value": 1.1667
+    },
+    {
+      "name": "Guard Petra",
+      "value": 1.0
+    }
+  ],
+  "top_pagerank": [
+    {
+      "name": "Guard Petra",
+      "value": 0.1736
+    },
+    {
+      "name": "Scholar Neri",
+      "value": 0.1599
+    },
+    {
+      "name": "Mayor Sol",
+      "value": 0.1599
+    },
+    {
+      "name": "Captain Hale",
+      "value": 0.1565
+    },
+    {
+      "name": "Aria",
+      "value": 0.1554
+    }
+  ],
+  "bridge_characters": [
+    {
+      "name": "Aria",
+      "betweenness_centrality": 0.319,
+      "articulation_point": false
+    },
+    {
+      "name": "Mayor Sol",
+      "betweenness_centrality": 0.319,
+      "articulation_point": false
+    },
+    {
+      "name": "Scholar Neri",
+      "betweenness_centrality": 0.3095,
+      "articulation_point": false
+    },
+    {
+      "name": "Broker Venn",
+      "betweenness_centrality": 0.3095,
+      "articulation_point": false
+    },
+    {
+      "name": "Oracle Ilex",
+      "betweenness_centrality": 0.2952,
+      "articulation_point": false
+    },
+    {
+      "name": "Captain Hale",
+      "betweenness_centrality": 0.2952,
+      "articulation_point": false
+    },
+    {
+      "name": "Guard Petra",
+      "betweenness_centrality": 0.2952,
+      "articulation_point": false
+    }
+  ],
+  "assets": {
+    "interactive_graph": "generated/long-corpus-chronicle/interactive_graph.html",
+    "styled_graph": "generated/long-corpus-chronicle/styled_graph.png",
+    "community_graph": "generated/long-corpus-chronicle/community_graph.png",
+    "temporal_histogram": "generated/long-corpus-chronicle/temporal_histogram.png",
+    "temporal_cumulative": "generated/long-corpus-chronicle/temporal_cumulative.png",
+    "centrality_chart": "generated/long-corpus-chronicle/centrality_chart.png",
+    "community_heatmap": "generated/long-corpus-chronicle/community_heatmap.png",
+    "metrics": "generated/long-corpus-chronicle/metrics.json"
+  }
+}

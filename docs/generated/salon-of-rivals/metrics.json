@@ -1,0 +1,118 @@
+{
+  "slug": "salon-of-rivals",
+  "title": "Salon of Rivals",
+  "description": "A compact court-intrigue scene that highlights interaction extraction, community structure, and bridge characters.",
+  "builder": "basic",
+  "text_excerpt": "Alice debated policy with Bob in the marble salon. Bob reassured Clara after the vote. Clara challenged Diana during the reception. Diana thanked Alice before meeting Edgar. Edgar praised Bob in front of Clara.",
+  "character_count": 5,
+  "relationship_groups": 5,
+  "community_count": 1,
+  "metrics": {
+    "number_of_nodes": 5,
+    "number_of_edges": 8,
+    "density": 0.4,
+    "reciprocity": 0.0,
+    "average_clustering": 0.6666666666666666,
+    "average_shortest_path": 1.2,
+    "degree_assortativity": 0.0,
+    "top_pagerank_character": "Clara",
+    "max_k_core": 3,
+    "bridge_characters": []
+  },
+  "graph_characteristics": {
+    "number_of_nodes": 5,
+    "number_of_edges": 8,
+    "average_degree": 3.2,
+    "average_clustering_coefficient": 0.6666666666666666,
+    "density": 0.4,
+    "degree_assortativity": 0.0
+  },
+  "temporal_metrics": {
+    "average_temporal_distance": 3.0,
+    "density": 0.4,
+    "reciprocity": 0.0,
+    "interaction_span": 4,
+    "interaction_events": 9
+  },
+  "top_degree": [
+    {
+      "name": "Edgar",
+      "value": 1.0
+    },
+    {
+      "name": "Alice",
+      "value": 0.75
+    },
+    {
+      "name": "Bob",
+      "value": 0.75
+    },
+    {
+      "name": "Clara",
+      "value": 0.75
+    },
+    {
+      "name": "Diana",
+      "value": 0.75
+    }
+  ],
+  "top_pagerank": [
+    {
+      "name": "Clara",
+      "value": 0.2557
+    },
+    {
+      "name": "Diana",
+      "value": 0.2474
+    },
+    {
+      "name": "Edgar",
+      "value": 0.1926
+    },
+    {
+      "name": "Bob",
+      "value": 0.1693
+    },
+    {
+      "name": "Alice",
+      "value": 0.1351
+    }
+  ],
+  "bridge_characters": [
+    {
+      "name": "Edgar",
+      "betweenness_centrality": 0.4667,
+      "articulation_point": false
+    },
+    {
+      "name": "Alice",
+      "betweenness_centrality": 0.4333,
+      "articulation_point": false
+    },
+    {
+      "name": "Bob",
+      "betweenness_centrality": 0.4333,
+      "articulation_point": false
+    },
+    {
+      "name": "Clara",
+      "betweenness_centrality": 0.4333,
+      "articulation_point": false
+    },
+    {
+      "name": "Diana",
+      "betweenness_centrality": 0.4333,
+      "articulation_point": false
+    }
+  ],
+  "assets": {
+    "interactive_graph": "generated/salon-of-rivals/interactive_graph.html",
+    "styled_graph": "generated/salon-of-rivals/styled_graph.png",
+    "community_graph": "generated/salon-of-rivals/community_graph.png",
+    "temporal_histogram": "generated/salon-of-rivals/temporal_histogram.png",
+    "temporal_cumulative": "generated/salon-of-rivals/temporal_cumulative.png",
+    "centrality_chart": "generated/salon-of-rivals/centrality_chart.png",
+    "community_heatmap": "generated/salon-of-rivals/community_heatmap.png",
+    "metrics": "generated/salon-of-rivals/metrics.json"
+  }
+}

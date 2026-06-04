@@ -15,3 +15,8 @@ env/
 
 # Local secrets/config
 .env
+
+# Local development corpora and benchmarks
+local_dev/
+local_corpora/
+benchmarks/

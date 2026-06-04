@@ -4,14 +4,16 @@ from functools import lru_cache
 import re
 import warnings
 
-import spacy
-import torch
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-
+try:
+    import torch
+except ImportError:  # pragma: no cover - optional runtime dependency in lightweight environments
+    torch = None
 
 @lru_cache(maxsize=4)
 def _load_t5_components(model_name):
     """Load and cache the tokenizer/model pair used for abstractive summaries."""
+    from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
     return tokenizer, model
@@ -19,23 +21,16 @@ def _load_t5_components(model_name):
 
 def _extract_interaction_summary(text):
     """Build a deterministic relation-focused summary without requiring Hugging Face downloads."""
-    try:
-        nlp = spacy.load("en_core_web_lg")
-        doc = nlp(text)
-        relations = []
+    relations = []
+    for sentence in [segment.strip() for segment in re.split(r"(?<=[.!?])\s+", text) if segment.strip()]:
+        people = re.findall(r"\b[A-Z][a-z]+\b", sentence)
+        verbs = re.findall(r"\b[a-z]{3,}\b", sentence)
+        if len(people) >= 2:
+            action = verbs[0] if verbs else "interacts"
+            relations.append(f"{people[0]} - {action} - {people[1]}")
 
-        for sentence in doc.sents:
-            people = [ent.text for ent in sentence.ents if ent.label_ == "PERSON"]
-            if len(people) < 2:
-                continue
-
-            root = next((token.lemma_ for token in sentence if token.dep_ == "ROOT" and token.pos_ in {"VERB", "AUX"}), "interact")
-            relations.append(f"{people[0]} - {root} - {people[1]}")
-
-        if relations:
-            return "; ".join(relations)
-    except Exception:
-        pass
+    if relations:
+        return "; ".join(relations)
 
     sentences = [segment.strip() for segment in re.split(r"(?<=[.!?])\s+", text) if segment.strip()]
     if sentences:
@@ -63,7 +58,7 @@ def summarize_t5(text, model_name="t5-small"):
             return_tensors="pt",
         )
 
-        if torch.cuda.is_available():
+        if torch is not None and torch.cuda.is_available():
             model = model.to("cuda")
             inputs = {key: value.to("cuda") for key, value in inputs.items()}
 

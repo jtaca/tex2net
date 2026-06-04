@@ -1,0 +1,105 @@
+{
+  "slug": "alias-resolution",
+  "title": "Alias Resolution",
+  "description": "A short investigation where near-duplicate names collapse into cleaner character identities.",
+  "builder": "basic",
+  "text_excerpt": "Mira Stone met Captain Ivo at sunrise. Mira Stonne briefed Captain Ivo beside the river. Captain Ivo introduced Mira Stone to Doctor Vale. Doctor Vahle warned Mira Stonne about Auditor Sen. Auditor Sen confronted\u2026",
+  "character_count": 4,
+  "relationship_groups": 5,
+  "community_count": 1,
+  "metrics": {
+    "number_of_nodes": 4,
+    "number_of_edges": 8,
+    "density": 0.6666666666666666,
+    "reciprocity": 0.5,
+    "average_clustering": 1.0,
+    "average_shortest_path": 1.0,
+    "degree_assortativity": 1.0,
+    "top_pagerank_character": "Captain Ivo",
+    "max_k_core": 3,
+    "bridge_characters": []
+  },
+  "graph_characteristics": {
+    "number_of_nodes": 4,
+    "number_of_edges": 8,
+    "average_degree": 4.0,
+    "average_clustering_coefficient": 1.0,
+    "density": 0.6666666666666666,
+    "degree_assortativity": 1.0
+  },
+  "temporal_metrics": {
+    "average_temporal_distance": 1.0,
+    "density": 0.6666666666666666,
+    "reciprocity": 0.5,
+    "interaction_span": 4,
+    "interaction_events": 9
+  },
+  "top_degree": [
+    {
+      "name": "Mira Stone",
+      "value": 1.6667
+    },
+    {
+      "name": "Captain Ivo",
+      "value": 1.3333
+    },
+    {
+      "name": "Doctor Vale",
+      "value": 1.3333
+    },
+    {
+      "name": "Auditor Sen",
+      "value": 1.0
+    }
+  ],
+  "top_pagerank": [
+    {
+      "name": "Captain Ivo",
+      "value": 0.2915
+    },
+    {
+      "name": "Mira Stone",
+      "value": 0.2614
+    },
+    {
+      "name": "Doctor Vale",
+      "value": 0.2354
+    },
+    {
+      "name": "Auditor Sen",
+      "value": 0.2116
+    }
+  ],
+  "bridge_characters": [
+    {
+      "name": "Mira Stone",
+      "betweenness_centrality": 0.5,
+      "articulation_point": false
+    },
+    {
+      "name": "Captain Ivo",
+      "betweenness_centrality": 0.5,
+      "articulation_point": false
+    },
+    {
+      "name": "Doctor Vale",
+      "betweenness_centrality": 0.5,
+      "articulation_point": false
+    },
+    {
+      "name": "Auditor Sen",
+      "betweenness_centrality": 0.5,
+      "articulation_point": false
+    }
+  ],
+  "assets": {
+    "interactive_graph": "generated/alias-resolution/interactive_graph.html",
+    "styled_graph": "generated/alias-resolution/styled_graph.png",
+    "community_graph": "generated/alias-resolution/community_graph.png",
+    "temporal_histogram": "generated/alias-resolution/temporal_histogram.png",
+    "temporal_cumulative": "generated/alias-resolution/temporal_cumulative.png",
+    "centrality_chart": "generated/alias-resolution/centrality_chart.png",
+    "community_heatmap": "generated/alias-resolution/community_heatmap.png",
+    "metrics": "generated/alias-resolution/metrics.json"
+  }
+}

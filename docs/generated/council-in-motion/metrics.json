@@ -1,0 +1,118 @@
+{
+  "slug": "council-in-motion",
+  "title": "Council in Motion",
+  "description": "Chunked extraction over a denser political sequence, emphasizing temporal patterns and evolving alliances.",
+  "builder": "chunked",
+  "text_excerpt": "Helena convened Marcus and Octavia in the war room. Marcus consulted Priya over the city maps. Octavia questioned Helena near the signal fire. Priya introduced Jonas to Marcus before dusk. Jonas warned Helena about\u2026",
+  "character_count": 5,
+  "relationship_groups": 8,
+  "community_count": 1,
+  "metrics": {
+    "number_of_nodes": 5,
+    "number_of_edges": 13,
+    "density": 0.65,
+    "reciprocity": 0.46153846153846156,
+    "average_clustering": 1.0,
+    "average_shortest_path": 1.0,
+    "degree_assortativity": 1.0,
+    "top_pagerank_character": "Marcus",
+    "max_k_core": 4,
+    "bridge_characters": []
+  },
+  "graph_characteristics": {
+    "number_of_nodes": 5,
+    "number_of_edges": 13,
+    "average_degree": 5.2,
+    "average_clustering_coefficient": 1.0,
+    "density": 0.65,
+    "degree_assortativity": 1.0
+  },
+  "temporal_metrics": {
+    "average_temporal_distance": 4.0,
+    "density": 0.65,
+    "reciprocity": 0.46153846153846156,
+    "interaction_span": 7,
+    "interaction_events": 14
+  },
+  "top_degree": [
+    {
+      "name": "Marcus",
+      "value": 1.5
+    },
+    {
+      "name": "Helena",
+      "value": 1.25
+    },
+    {
+      "name": "Octavia",
+      "value": 1.25
+    },
+    {
+      "name": "Priya",
+      "value": 1.25
+    },
+    {
+      "name": "Jonas",
+      "value": 1.25
+    }
+  ],
+  "top_pagerank": [
+    {
+      "name": "Marcus",
+      "value": 0.2259
+    },
+    {
+      "name": "Priya",
+      "value": 0.2239
+    },
+    {
+      "name": "Octavia",
+      "value": 0.1947
+    },
+    {
+      "name": "Jonas",
+      "value": 0.1892
+    },
+    {
+      "name": "Helena",
+      "value": 0.1664
+    }
+  ],
+  "bridge_characters": [
+    {
+      "name": "Helena",
+      "betweenness_centrality": 0.4,
+      "articulation_point": false
+    },
+    {
+      "name": "Marcus",
+      "betweenness_centrality": 0.4,
+      "articulation_point": false
+    },
+    {
+      "name": "Octavia",
+      "betweenness_centrality": 0.4,
+      "articulation_point": false
+    },
+    {
+      "name": "Priya",
+      "betweenness_centrality": 0.4,
+      "articulation_point": false
+    },
+    {
+      "name": "Jonas",
+      "betweenness_centrality": 0.4,
+      "articulation_point": false
+    }
+  ],
+  "assets": {
+    "interactive_graph": "generated/council-in-motion/interactive_graph.html",
+    "styled_graph": "generated/council-in-motion/styled_graph.png",
+    "community_graph": "generated/council-in-motion/community_graph.png",
+    "temporal_histogram": "generated/council-in-motion/temporal_histogram.png",
+    "temporal_cumulative": "generated/council-in-motion/temporal_cumulative.png",
+    "centrality_chart": "generated/council-in-motion/centrality_chart.png",
+    "community_heatmap": "generated/council-in-motion/community_heatmap.png",
+    "metrics": "generated/council-in-motion/metrics.json"
+  }
+}

@@ -1,142 +1,200 @@
-# character_interaction_graph/graph.py
+from __future__ import annotations
 
-import spacy
-import networkx as nx
+from difflib import SequenceMatcher
+from functools import lru_cache
 from itertools import combinations
-from transformers import pipeline
+import re
+import warnings
+
+import networkx as nx
 
 
+DEFAULT_SPACY_MODELS = ("en_core_web_lg", "en_core_web_sm")
+DEFAULT_STOPWORDS = {
+    "a", "an", "and", "as", "at", "be", "for", "from", "had", "has", "have",
+    "he", "her", "hers", "him", "his", "i", "in", "is", "it", "its", "of", "on",
+    "or", "our", "she", "that", "the", "their", "them", "they", "to", "was", "we",
+    "were", "with", "you", "your",
+}
 
-def create_character_graph(text):
-    """
-    Creates a directed character graph from the input text using spaCy for NER.
-    """
 
-    # Load the 'en_core_web_lg' model (you can switch to 'en_core_web_sm' if needed)
-    nlp = spacy.load('en_core_web_lg')
+@lru_cache(maxsize=4)
+def get_nlp_pipeline(model_candidates=DEFAULT_SPACY_MODELS):
+    """Load a spaCy pipeline once and fall back to a blank English pipeline."""
+    import spacy
 
-    # Process the text
-    doc = nlp(text)
+    candidates = tuple(model_candidates or DEFAULT_SPACY_MODELS)
+    for model_name in candidates:
+        try:
+            return spacy.load(model_name)
+        except OSError:
+            continue
 
-    # Initialize character and relationship lists
-    characters = []
-    relationships = []
+    nlp = spacy.blank("en")
+    if "sentencizer" not in nlp.pipe_names:
+        nlp.add_pipe("sentencizer")
+    return nlp
 
-    # Identify person entities
-    for entity in doc.ents:
-        if entity.label_ == "PERSON":
-            character_name = entity.text
-            if character_name not in characters:
-                characters.append(character_name)
 
-    # Create a NetworkX directed graph
-    graph = nx.DiGraph()
-    graph.add_nodes_from(characters)
+@lru_cache(maxsize=1)
+def get_question_answering_pipeline():
+    """Load the optional QA pipeline lazily so core extraction stays lightweight."""
+    from transformers import pipeline
 
-    # Initialize sentence ID counter
-    sentence_id = 0
+    return pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 
-    # Process each sentence to extract relationships
-    for sentence in doc.sents:
-        sentence_id += 1
-        mentioned_characters = []
 
-        # Identify characters in the sentence
-        for entity in sentence.ents:
-            if entity.label_ == "PERSON":
-                character_name = entity.text
-                if character_name not in characters:
-                    characters.append(character_name)
-                mentioned_characters.append(character_name)
+def _resolve_nlp(nlp=None, model_candidates=None):
+    return nlp or get_nlp_pipeline(tuple(model_candidates or DEFAULT_SPACY_MODELS))
 
-        # If more than one character is mentioned, treat it as a relationship
-        if len(mentioned_characters) > 1:
-            relationships.append(mentioned_characters)
 
-            # Determine the main action (relationship) based on sentence structure
-            action_tokens = []
-            for token in sentence:
-                if token.dep_ == "ROOT":
-                    action_tokens.append(token.text)
-                elif token.dep_ == "xcomp" and token.head.text in ["be", "are", "is"]:
-                    action_tokens.append(token.text)
-                elif token.dep_ == "attr" and token.head.dep_ == "ROOT":
-                    action_tokens.append(token.text)
-                elif token.dep_ == "prep" and token.head.dep_ == "ROOT" and token.head.head.text in ["be", "are", "is"]:
-                    action_tokens.append(token.text)
+def _deduplicate_preserve_order(values):
+    seen = set()
+    result = []
+    for value in values:
+        cleaned = value.strip()
+        key = cleaned.lower()
+        if cleaned and key not in seen:
+            seen.add(key)
+            result.append(cleaned)
+    return result
 
-            action = " ".join(action_tokens) if action_tokens else ""
 
-            # Add edges between all mentioned characters
-            for i in range(len(mentioned_characters) - 1):
-                for j in range(i + 1, len(mentioned_characters)):
-                    source = mentioned_characters[i]
-                    target = mentioned_characters[j]
+def _normalize_character_name(name):
+    return re.sub(r"[^a-z0-9\s]", "", name.lower()).strip()
 
-                    # Decide direction of edge based on who performed the action
-                    if action and source in sentence.text and target in sentence.text:
-                        if graph.has_edge(source, target):
-                            graph[source][target]["actions"].append(action)
-                            graph[source][target]["sentence_ids"].append(sentence_id)
-                        else:
-                            graph.add_edge(
-                                source,
-                                target,
-                                actions=[action],
-                                sentence_ids=[sentence_id],
-                                bidirectional=True
-                            )
-                    else:
-                        if graph.has_edge(source, target):
-                            graph[source][target]["actions"].append(action)
-                            graph[source][target]["sentence_ids"].append(sentence_id)
-                        else:
-                            graph.add_edge(
-                                source,
-                                target,
-                                actions=[action],
-                                sentence_ids=[sentence_id],
-                                bidirectional=False
-                            )
 
-    return graph, characters, relationships
+def _fallback_character_candidates(text_string):
+    candidates = re.findall(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b", text_string)
+    return _deduplicate_preserve_order(candidates)
+
+
+def _extract_sentence_spans(text, nlp_pipeline):
+    doc = nlp_pipeline(text)
+    sentences = [sentence for sentence in doc.sents if sentence.text.strip()]
+    if not sentences:
+        sentences = [doc[:]]
+    return doc, sentences
 
 
 def clean_action_label(action_label, char_list):
-    """
-    Remove repeated character names from the action label (case-insensitive),
-    trim extra whitespace, and truncate overly long text.
-    """
-    import re
-
+    """Normalize an action label by removing repeated character names and trimming text."""
     for char in char_list:
-        # Regex word boundary to avoid partial matches
         pattern = r"(?i)\b" + re.escape(char) + r"\b"
         action_label = re.sub(pattern, "", action_label)
 
-    # Remove extra spaces
     action_label = " ".join(action_label.split())
-
-    # Truncate if too long
-    max_length = 50
-    if len(action_label) > max_length:
-        action_label = action_label[:max_length] + "..."
-
-    return action_label
+    if len(action_label) > 50:
+        action_label = action_label[:50] + "..."
+    return action_label.strip()
 
 
-def extract_person_entities(text_string):
-    """Extract PERSON entities from a string using spaCy."""
-    nlp = spacy.load("en_core_web_lg")
-    temp_doc = nlp(text_string)
-    return [ent.text for ent in temp_doc.ents if ent.label_ == "PERSON"]
+def extract_person_entities(text_string, nlp=None, model_candidates=None):
+    """Extract PERSON entities from text using spaCy with a regex fallback."""
+    nlp_pipeline = _resolve_nlp(nlp=nlp, model_candidates=model_candidates)
+    doc = nlp_pipeline(text_string)
+    people = [ent.text for ent in getattr(doc, "ents", []) if ent.label_ == "PERSON"]
+    if people:
+        return _deduplicate_preserve_order(people)
+    return _fallback_character_candidates(text_string)
+
+
+def _extract_sentence_characters(sentence, nlp_pipeline):
+    people = [ent.text for ent in getattr(sentence, "ents", []) if ent.label_ == "PERSON"]
+    if people:
+        return _deduplicate_preserve_order(people)
+    return extract_person_entities(sentence.text, nlp=nlp_pipeline)
+
+
+def _extract_action_label(sentence, characters):
+    action_tokens = []
+    character_tokens = {
+        token
+        for character in characters
+        for token in _normalize_character_name(character).split()
+        if token
+    }
+
+    for token in sentence:
+        dependency = getattr(token, "dep_", "")
+        part_of_speech = getattr(token, "pos_", "")
+        if dependency == "ROOT" and token.text.strip():
+            action_tokens.append(token.lemma_ if getattr(token, "lemma_", "") else token.text)
+        elif dependency == "xcomp" and getattr(token.head, "text", "") in {"be", "are", "is"}:
+            action_tokens.append(token.text)
+        elif dependency == "attr" and getattr(token.head, "dep_", "") == "ROOT":
+            action_tokens.append(token.text)
+        elif part_of_speech == "VERB" and not action_tokens:
+            action_tokens.append(token.lemma_ if getattr(token, "lemma_", "") else token.text)
+
+    if not action_tokens:
+        for token in sentence:
+            cleaned = token.text.strip(" ,.;:!?\"'()[]{}").lower()
+            if cleaned and cleaned.isalpha() and cleaned not in DEFAULT_STOPWORDS and cleaned not in character_tokens:
+                action_tokens.append(cleaned)
+                break
+
+    action = clean_action_label(" ".join(action_tokens), characters)
+    return action or "interacts"
+
+
+def _merge_edge_payload(existing_payload, new_payload):
+    for field in ("actions", "sentence_ids", "evidence_sentences"):
+        existing_payload.setdefault(field, [])
+        existing_payload[field].extend(new_payload.get(field, []))
+    existing_payload["bidirectional"] = existing_payload.get("bidirectional", False) or new_payload.get("bidirectional", False)
+
+
+def _add_interaction(graph, source, target, action, sentence_id, sentence_text, bidirectional=True):
+    payload = {
+        "actions": [action],
+        "sentence_ids": [sentence_id],
+        "evidence_sentences": [sentence_text],
+        "bidirectional": bidirectional,
+    }
+    if graph.has_edge(source, target):
+        _merge_edge_payload(graph[source][target], payload)
+    else:
+        graph.add_edge(source, target, **payload)
+
+
+def create_character_graph(text, nlp=None, model_candidates=None, merge_similar=False, similarity_threshold=0.9):
+    """Create a directed character graph from narrative text."""
+    if not text or not text.strip():
+        return nx.DiGraph(), [], []
+
+    nlp_pipeline = _resolve_nlp(nlp=nlp, model_candidates=model_candidates)
+    _, sentences = _extract_sentence_spans(text, nlp_pipeline)
+    characters = extract_person_entities(text, nlp=nlp_pipeline)
+    graph = nx.DiGraph()
+    graph.add_nodes_from(characters)
+    relationships = []
+
+    for sentence_id, sentence in enumerate(sentences, start=1):
+        sentence_characters = _extract_sentence_characters(sentence, nlp_pipeline)
+        if not sentence_characters:
+            continue
+
+        characters = _deduplicate_preserve_order(characters + sentence_characters)
+        for character in sentence_characters:
+            graph.add_node(character)
+
+        if len(sentence_characters) <= 1:
+            continue
+
+        relationships.append(sentence_characters)
+        action = _extract_action_label(sentence, sentence_characters)
+        for source, target in combinations(sentence_characters, 2):
+            _add_interaction(graph, source, target, action, sentence_id, sentence.text.strip(), bidirectional=True)
+
+    if merge_similar:
+        graph = join_similar_nodes(graph, list(graph.nodes), similarity_threshold=similarity_threshold)
+
+    return graph, list(graph.nodes), relationships
 
 
 def count_cooccurrences(graph, char1, char2):
-    """
-    Count how many distinct sentence IDs mention both char1 and char2
-    (considering edges in both directions).
-    """
+    """Count distinct sentence IDs mentioning both characters across both directions."""
     sentence_ids = set()
     if graph.has_edge(char1, char2):
         sentence_ids.update(graph[char1][char2].get("sentence_ids", []))
@@ -144,238 +202,236 @@ def count_cooccurrences(graph, char1, char2):
         sentence_ids.update(graph[char2][char1].get("sentence_ids", []))
     return len(sentence_ids)
 
-def create_character_graph_llm_chunked(text, chunk_size=5):
 
+def create_character_graph_llm_chunked(
+    text,
+    chunk_size=5,
+    nlp=None,
+    qa_pipeline=None,
+    sentence_id_offset=0,
+    similarity_threshold=0.9,
+):
+    """Process long text in chunks and keep global sentence IDs stable."""
+    if not text or not text.strip():
+        return nx.DiGraph(), [], []
 
-    """
-    Creates a directed character graph from very long text by processing it
-    in 'chunks' of sentences. Each chunk uses an LLM (QA pipeline) to infer
-    which characters are interacting and what the main action is.
+    nlp_pipeline = _resolve_nlp(nlp=nlp)
+    _, sentences = _extract_sentence_spans(text, nlp_pipeline)
 
-    :param text: The full text to analyze.
-    :param chunk_size: Number of sentences to process at once before continuing.
-    :return: (graph, characters, relationships)
-        graph: A NetworkX directed graph of interactions
-        characters: A list of unique characters discovered
-        relationships: A list of character groupings per chunk-sentence
-    """
+    if qa_pipeline is None:
+        try:
+            qa_pipeline = get_question_answering_pipeline()
+        except Exception as exc:
+            warnings.warn(
+                f"Falling back to heuristic chunked extraction because the QA pipeline could not be loaded: {exc}",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            qa_pipeline = False
 
-    nlp = spacy.load("en_core_web_lg")
-
-    # QA pipeline for extracting interactions from text
-    qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
-
-    # Split the text into spaCy sentences
-    doc = nlp(text)
-    sentences = list(doc.sents)
-
-    # A global graph to accumulate results
     graph = nx.DiGraph()
-    all_characters = set()
+    all_characters = []
     relationships = []
+    conversation_so_far = ""
+    indexed_sentences = list(enumerate(sentences, start=sentence_id_offset + 1))
 
-    conversation_so_far = ""  # We'll build context incrementally
-    current_chunk = []
-
-    def process_chunk(chunk_sentences, conversation_context):
-        """
-        Process a list of sentences as one 'chunk':
-         - For each sentence, do QA-based detection of characters + action.
-         - Update the graph, relationships, and global character set.
-        Returns the updated conversation context (for the next chunk).
-        """
-        nonlocal graph, all_characters, relationships
-
-        for sent_id, sentence in enumerate(chunk_sentences, start=1):
+    for chunk_start in range(0, len(indexed_sentences), chunk_size):
+        chunk = indexed_sentences[chunk_start:chunk_start + chunk_size]
+        for sent_id, sentence in chunk:
             text_sent = sentence.text.strip()
-            # 1) Direct mentions via spaCy
-            direct_mentions = extract_person_entities(text_sent)
+            sentence_characters = extract_person_entities(text_sent, nlp=nlp_pipeline)
+            action_label = _extract_action_label(sentence, sentence_characters or _fallback_character_candidates(text_sent))
 
-            # 2) QA-based detection
-            question_for_chars = (
-                f"Which characters (PERSONs) are interacting in this sentence:\n\n"
-                f"'{text_sent}'\n\n"
-                f"Conversation so far:\n\n'{conversation_context}'"
-            )
-            question_for_action = (
-                f"What is the main action or interaction described in this sentence:\n\n"
-                f"'{text_sent}'"
-            )
-
-            try:
-                result_chars = qa_pipeline(
-                    question=question_for_chars, 
-                    context=conversation_context + "\n" + text_sent
+            if qa_pipeline:
+                question_for_chars = (
+                    "Which characters (PERSONs) are interacting in this sentence:\n\n"
+                    f"'{text_sent}'\n\n"
+                    f"Conversation so far:\n\n'{conversation_so_far}'"
                 )
-                found_chars_str = result_chars.get("answer", "")
-            except Exception as e:
-                found_chars_str = ""
-                print(f"QA for characters failed: {e}")
-
-            try:
-                result_action = qa_pipeline(
-                    question=question_for_action, 
-                    context=text_sent
+                question_for_action = (
+                    "What is the main action or interaction described in this sentence:\n\n"
+                    f"'{text_sent}'"
                 )
-                action_label = result_action.get("answer", "").strip()
-            except Exception as e:
-                action_label = ""
-                print(f"QA for action failed: {e}")
 
-            # Combine direct + QA-based mentions
-            qa_chars = extract_person_entities(found_chars_str)
-            sentence_chars = set(direct_mentions + qa_chars)
-
-            # Clean the action label
-            action_label = clean_action_label(action_label, sentence_chars)
-
-            # If more than one character => treat as a relationship
-            if len(sentence_chars) > 1:
-                relationships.append(list(sentence_chars))
-
-                # Add to global set
-                all_characters.update(sentence_chars)
-
-                # Create edges among them
-                char_list = list(sentence_chars)
-                for i in range(len(char_list) - 1):
-                    for j in range(i + 1, len(char_list)):
-                        source = char_list[i]
-                        target = char_list[j]
-
-                        if graph.has_edge(source, target):
-                            graph[source][target]["actions"].append(action_label)
-                            graph[source][target]["sentence_ids"].append(sent_id)
-                        else:
-                            graph.add_edge(
-                                source,
-                                target,
-                                actions=[action_label],
-                                sentence_ids=[sent_id],
-                                bidirectional=True
-                            )
-            else:
-                # Still add single characters to global set, even if no edges
-                all_characters.update(sentence_chars)
-
-            # Update conversation context
-            conversation_context += text_sent + " "
-
-        return conversation_context
-
-    # Process the text in chunks of chunk_size sentences
-    for i, sentence in enumerate(sentences, start=1):
-        current_chunk.append(sentence)
-        if i % chunk_size == 0:
-            # Process this chunk
-            conversation_so_far = process_chunk(current_chunk, conversation_so_far)
-            current_chunk = []
-
-    # Process any leftover sentences
-    if current_chunk:
-        conversation_so_far = process_chunk(current_chunk, conversation_so_far)
-
-    # Ensure all discovered characters are in the graph
-    for char in all_characters:
-        if char not in graph.nodes:
-            graph.add_node(char)
-
-    return graph, list(all_characters), relationships
-
-
-def join_similar_nodes(graph, characters):
-    """
-    Merges nodes with very similar names (e.g., 'Winston' and 'Winstons')
-    by transferring edges from the duplicate node to the main node.
-    """
-    from itertools import combinations
-    character_combinations = combinations(characters, 2)
-
-    for character1, character2 in character_combinations:
-        if character1.lower() in character2.lower() or character2.lower() in character1.lower():
-            if character1 in graph.nodes and character2 in graph.nodes:
                 try:
-                    if graph.has_edge(character1, character2):
-                        graph[character1][character2]["actions"] += graph[character2][character1]["actions"]
-                        graph[character1][character2]["sentence_ids"] += graph[character2][character1]["sentence_ids"]
-                        graph.remove_edge(character2, character1)
-                    elif graph.has_edge(character2, character1):
-                        graph[character2][character1]["actions"] += graph[character1][character2]["actions"]
-                        graph[character2][character1]["sentence_ids"] += graph[character1][character2]["sentence_ids"]
-                        graph.remove_edge(character1, character2)
-                except Exception:
-                    pass
+                    result_chars = qa_pipeline(question=question_for_chars, context=conversation_so_far + "\n" + text_sent)
+                    sentence_characters.extend(extract_person_entities(result_chars.get("answer", ""), nlp=nlp_pipeline))
+                except Exception as exc:
+                    warnings.warn(f"QA character extraction failed for sentence {sent_id}: {exc}", RuntimeWarning, stacklevel=2)
 
-                graph.remove_node(character2)
+                try:
+                    result_action = qa_pipeline(question=question_for_action, context=text_sent)
+                    candidate_action = clean_action_label(result_action.get("answer", "").strip(), sentence_characters)
+                    if candidate_action:
+                        action_label = candidate_action
+                except Exception as exc:
+                    warnings.warn(f"QA action extraction failed for sentence {sent_id}: {exc}", RuntimeWarning, stacklevel=2)
+
+            sentence_characters = _deduplicate_preserve_order(sentence_characters)
+            all_characters = _deduplicate_preserve_order(all_characters + sentence_characters)
+
+            for character in sentence_characters:
+                graph.add_node(character)
+
+            if len(sentence_characters) > 1:
+                relationships.append(sentence_characters)
+                for source, target in combinations(sentence_characters, 2):
+                    _add_interaction(graph, source, target, action_label or "interacts", sent_id, text_sent, bidirectional=True)
+
+            conversation_so_far += text_sent + " "
+
+    graph = join_similar_nodes(graph, list(graph.nodes), similarity_threshold=similarity_threshold)
+    return graph, list(graph.nodes), relationships
+
+
+def _is_similar_character(name_a, name_b, similarity_threshold=0.9):
+    normalized_a = _normalize_character_name(name_a)
+    normalized_b = _normalize_character_name(name_b)
+    if not normalized_a or not normalized_b:
+        return False
+    if normalized_a == normalized_b:
+        return True
+
+    ratio = SequenceMatcher(None, normalized_a, normalized_b).ratio()
+    tokens_a = set(normalized_a.split())
+    tokens_b = set(normalized_b.split())
+    if tokens_a and tokens_b and (tokens_a.issubset(tokens_b) or tokens_b.issubset(tokens_a)) and ratio >= max(0.84, similarity_threshold - 0.08):
+        return True
+    if min(len(normalized_a), len(normalized_b)) >= 5 and ratio >= similarity_threshold:
+        return True
+    return False
+
+
+def find_character_alias_groups(characters, similarity_threshold=0.9):
+    """Group highly similar character names while preserving first-seen order."""
+    groups = []
+    for character in _deduplicate_preserve_order(characters):
+        for group in groups:
+            if any(_is_similar_character(character, member, similarity_threshold=similarity_threshold) for member in group):
+                group.append(character)
+                break
+        else:
+            groups.append([character])
+    return groups
+
+
+def _merge_nodes(graph, canonical_name, alias_name):
+    if canonical_name == alias_name or canonical_name not in graph or alias_name not in graph:
+        return
+
+    graph.nodes[canonical_name].setdefault("aliases", [])
+    graph.nodes[canonical_name]["aliases"] = _deduplicate_preserve_order(graph.nodes[canonical_name]["aliases"] + [alias_name])
+
+    for predecessor, _, data in list(graph.in_edges(alias_name, data=True)):
+        if predecessor == canonical_name:
+            continue
+        payload = {
+            "actions": list(data.get("actions", [])),
+            "sentence_ids": list(data.get("sentence_ids", [])),
+            "evidence_sentences": list(data.get("evidence_sentences", [])),
+            "bidirectional": data.get("bidirectional", False),
+        }
+        if graph.has_edge(predecessor, canonical_name):
+            _merge_edge_payload(graph[predecessor][canonical_name], payload)
+        else:
+            graph.add_edge(predecessor, canonical_name, **payload)
+
+    for _, successor, data in list(graph.out_edges(alias_name, data=True)):
+        if successor == canonical_name:
+            continue
+        payload = {
+            "actions": list(data.get("actions", [])),
+            "sentence_ids": list(data.get("sentence_ids", [])),
+            "evidence_sentences": list(data.get("evidence_sentences", [])),
+            "bidirectional": data.get("bidirectional", False),
+        }
+        if graph.has_edge(canonical_name, successor):
+            _merge_edge_payload(graph[canonical_name][successor], payload)
+        else:
+            graph.add_edge(canonical_name, successor, **payload)
+
+    graph.remove_node(alias_name)
+
+
+def join_similar_nodes(graph, characters, similarity_threshold=0.9):
+    """Merge nodes with highly similar names while retaining edge evidence."""
+    for group in find_character_alias_groups(characters, similarity_threshold=similarity_threshold):
+        if len(group) < 2:
+            continue
+        canonical_name = group[0]
+        for alias_name in group[1:]:
+            _merge_nodes(graph, canonical_name, alias_name)
     return graph
 
 
+def create_character_graph_llm_long_text(
+    text,
+    max_chunk_chars=1000,
+    chunk_size=5,
+    nlp=None,
+    qa_pipeline=None,
+    similarity_threshold=0.9,
+):
+    """Create a graph from arbitrarily long text while preserving global sentence IDs."""
+    if not text or not text.strip():
+        return nx.DiGraph(), [], []
 
-# Nova função para processar texto longo em chunks "digestíveis"
-def create_character_graph_llm_long_text(text, max_chunk_chars=1000, chunk_size=5):
-    """
-    Cria um grafo de personagens a partir de um texto arbitrariamente longo,
-    dividindo o texto em chunks de sentenças onde cada chunk possui no máximo
-    max_chunk_chars caracteres (para evitar dividir sentenças no meio). Cada
-    chunk é processado utilizando um LLM para extrair as interações, e os grafos
-    resultantes são mesclados com base nos nomes dos nós.
+    nlp_pipeline = _resolve_nlp(nlp=nlp)
+    _, sentence_spans = _extract_sentence_spans(text, nlp_pipeline)
+    sentences = [sentence.text.strip() for sentence in sentence_spans if sentence.text.strip()]
 
-    :param text: Texto completo a ser analisado.
-    :param max_chunk_chars: Número máximo de caracteres por chunk.
-    :param chunk_size: Número de sentenças processadas de cada vez pelo LLM em cada chunk.
-    :return: (grafo, personagens, relacionamentos)
-             grafo: Grafo direcionado (NetworkX) das interações.
-             personagens: Lista de personagens únicos descobertos.
-             relacionamentos: Lista de agrupamentos de personagens por chunk.
-    """
-    nlp = spacy.load("en_core_web_lg")
-    
-    # Divide o texto em sentenças usando spaCy
-    doc = nlp(text)
-    sentences = [sent.text.strip() for sent in doc.sents if sent.text.strip()]
-    
-    # Agrupa as sentenças em chunks sem ultrapassar max_chunk_chars
     chunks = []
     current_chunk = []
     current_length = 0
-    for sent in sentences:
-        # Se adicionar esta sentença ultrapassar o limite e já houver um chunk em andamento,
-        # finalize o chunk e inicie um novo.
-        if current_length + len(sent) > max_chunk_chars and current_chunk:
+    for sentence in sentences:
+        sentence_length = len(sentence)
+        if current_chunk and current_length + sentence_length > max_chunk_chars:
             chunks.append(current_chunk)
-            current_chunk = [sent]
-            current_length = len(sent)
+            current_chunk = [sentence]
+            current_length = sentence_length
         else:
-            current_chunk.append(sent)
-            current_length += len(sent)
+            current_chunk.append(sentence)
+            current_length += sentence_length
     if current_chunk:
         chunks.append(current_chunk)
-    
-    # Variáveis globais para mesclar os resultados de cada chunk
+
     global_graph = nx.DiGraph()
-    global_characters = set()
     global_relationships = []
-    
-    # Processa cada chunk separadamente e mescla os grafos
+    sentence_offset = 0
+
     for chunk in chunks:
         chunk_text = " ".join(chunk)
-        # Processa o chunk utilizando a função existente (que já faz chunking interno)
-        chunk_graph, chunk_chars, chunk_rels = create_character_graph_llm_chunked(chunk_text, chunk_size=chunk_size)
-        # Mescla nós
-        for node in chunk_graph.nodes():
-            global_graph.add_node(node)
-        # Mescla arestas; se a aresta já existir, concatena os dados
-        for u, v, data in chunk_graph.edges(data=True):
-            if global_graph.has_edge(u, v):
-                global_graph[u][v]["actions"].extend(data.get("actions", []))
-                global_graph[u][v]["sentence_ids"].extend(data.get("sentence_ids", []))
+        chunk_graph, _, chunk_relationships = create_character_graph_llm_chunked(
+            chunk_text,
+            chunk_size=chunk_size,
+            nlp=nlp_pipeline,
+            qa_pipeline=qa_pipeline,
+            sentence_id_offset=sentence_offset,
+            similarity_threshold=similarity_threshold,
+        )
+
+        for node, data in chunk_graph.nodes(data=True):
+            if node not in global_graph:
+                global_graph.add_node(node, **data)
+            elif data.get("aliases"):
+                global_graph.nodes[node].setdefault("aliases", [])
+                global_graph.nodes[node]["aliases"] = _deduplicate_preserve_order(global_graph.nodes[node]["aliases"] + data["aliases"])
+
+        for source, target, data in chunk_graph.edges(data=True):
+            payload = {
+                "actions": list(data.get("actions", [])),
+                "sentence_ids": list(data.get("sentence_ids", [])),
+                "evidence_sentences": list(data.get("evidence_sentences", [])),
+                "bidirectional": data.get("bidirectional", False),
+            }
+            if global_graph.has_edge(source, target):
+                _merge_edge_payload(global_graph[source][target], payload)
             else:
-                global_graph.add_edge(u, v, **data)
-        global_characters.update(chunk_chars)
-        global_relationships.extend(chunk_rels)
-    
-    # Opcional: mesclar nós com nomes similares
-    global_graph = join_similar_nodes(global_graph, list(global_characters))
-    
-    return global_graph, list(global_characters), global_relationships
+                global_graph.add_edge(source, target, **payload)
+
+        global_relationships.extend(chunk_relationships)
+        sentence_offset += len(chunk)
+
+    global_graph = join_similar_nodes(global_graph, list(global_graph.nodes), similarity_threshold=similarity_threshold)
+    return global_graph, list(global_graph.nodes), global_relationships
 

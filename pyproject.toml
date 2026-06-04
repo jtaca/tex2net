@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tex2net"
-version = "1.39"
+version = "1.40"
 description = "Build character graphs from text."
 authors = [
   { name = "jtaca", email = "joaotiagoaparicio@gmail.com" }
@@ -25,7 +25,7 @@ dependencies = [
   "python-dotenv",
   "PyPDF2",
   "lxml",
-  "spacy==3.8.3",
+  "spacy>=3.8.13,<4",
   "networkx>=2.0",
   "matplotlib>=3.0",
   "transformers>=4.0",
